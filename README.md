@@ -226,5 +226,4 @@ demo3/
 
 ## 九.界面展示
 <img width="1910" height="963" alt="image" src="https://github.com/user-attachments/assets/60272b56-7e93-46b9-91b7-514b5afdb05f" />
-<img width="1917" height="977" alt="image" src="https://github.com/user-attachments/assets/8afecc7a-8519-4bf3-b58a-50ec73ccced1" />
-
+<img width="1907" height="907" alt="image" src="https://github.com/user-attachments/assets/9c515894-d023-43e5-9fc4-fb2bb5f0b294" />
