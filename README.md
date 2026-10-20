@@ -223,3 +223,8 @@ demo3/
 - 密码明文存储：生产环境应使用 BCrypt + 盐值，并加登录失败次数限制
 - 无注册/找回密码：账号由管理员在数据库预置
 - 权限粒度到「角色 + 权限码」：更细可扩展到数据行级权限
+
+## 九.界面展示
+<img width="1910" height="963" alt="image" src="https://github.com/user-attachments/assets/60272b56-7e93-46b9-91b7-514b5afdb05f" />
+<img width="1917" height="977" alt="image" src="https://github.com/user-attachments/assets/8afecc7a-8519-4bf3-b58a-50ec73ccced1" />
+
