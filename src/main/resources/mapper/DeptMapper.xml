@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo3.mapper.DeptMapper">
+
+    <resultMap id="deptResultMap" type="Dept">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_desc" property="deptDesc"/>
+        <result column="create_time" property="createTime"/>
+        <!-- 子查询统计部门员工数，与主查询一次完成，避免 N+1 -->
+        <result column="emp_count" property="empCount"/>
+    </resultMap>
+
+    <!-- 部门+员工数联查：标量子查询一次算出，循环里就不用再查 emp 表 -->
+    <sql id="deptWithCount">
+        SELECT d.*,
+               (SELECT COUNT(*) FROM emp e WHERE e.dept_id = d.id) AS emp_count
+        FROM dept d
+    </sql>
+
+    <select id="getDeptById" resultMap="deptResultMap">
+        <include refid="deptWithCount"/>
+        WHERE d.id = #{id}
+    </select>
+
+    <select id="selectAllDept" resultMap="deptResultMap">
+        <include refid="deptWithCount"/>
+        ORDER BY d.id
+    </select>
+
+    <select id="getDeptByName" resultType="Dept">
+        SELECT * FROM dept WHERE dept_name = #{deptName}
+    </select>
+
+    <insert id="insertDept" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO dept(dept_name, dept_desc, create_time)
+        VALUES(#{deptName}, #{deptDesc}, #{createTime})
+    </insert>
+
+    <update id="updateDept">
+        UPDATE dept
+        SET dept_name = #{deptName},
+            dept_desc = #{deptDesc}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteDept">
+        DELETE FROM dept WHERE id = #{id}
+    </delete>
+
+</mapper>

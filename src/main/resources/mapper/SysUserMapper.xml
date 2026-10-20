@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo3.mapper.SysUserMapper">
+
+    <select id="getByUsername" resultType="SysUser">
+        SELECT * FROM sys_user WHERE username = #{username}
+    </select>
+
+    <!-- 只查 perm_code 一列，鉴权时够用且轻量 -->
+    <select id="selectPermCodesByRole" resultType="string">
+        SELECT perm_code FROM permission WHERE role = #{role}
+    </select>
+
+    <select id="selectPermsByRole" resultType="Permission">
+        SELECT * FROM permission WHERE role = #{role} ORDER BY id
+    </select>
+
+</mapper>

@@ -1,0 +1,69 @@
+# 服务端口
+server:
+  port: 8080
+
+# MySQL数据库连接配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/emp_manage?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Ywy20040228
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      # 慢SQL监控：超过1秒的SQL记WARN日志
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+  # Redis缓存配置（热点部门数据 + 高频查询结果）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:            # 无密码留空即可
+      database: 0
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+          max-wait: 3000
+      # 缓存键序列化用字符串，避免JDK序列化乱码
+  # 启动时自动执行建表与种子数据脚本
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+      continue-on-error: true
+
+# MyBatis配置
+mybatis:
+  # mapper xml文件存放位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类别名包，简化xml里resultType
+  type-aliases-package: com.example.demo3.entity
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰：数据库 dept_id → Java实体 deptId
+    # 生产环境不打印SQL，调试时改为 org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# PageHelper分页插件配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true          # 页码超出范围时返回最后一页而非空数据
+  support-methods-arguments: true
+  params: count=countSql
+
+# 日志级别：本项目日志，方便排障
+logging:
+  level:
+    com.example.demo3: debug

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace：绑定Mapper接口全类名 -->
+<mapper namespace="com.example.demo3.mapper.EmpMapper">
+
+    <!--
+        结果映射：emp 表字段 + 联查的 dept_name
+        association：一对一关联（员工 → 部门），一次JOIN拿到部门名，
+        避免"先查员工、再循环查部门"的 N+1 次查询问题
+    -->
+    <resultMap id="empResultMap" type="Emp">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="job" property="job"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="entry_date" property="entryDate"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <!-- 联查出来的部门名称，映射到实体非数据库字段 deptName -->
+        <result column="dept_name" property="deptName"/>
+    </resultMap>
+
+    <!-- 员工+部门联查的公共SQL片段：LEFT JOIN 保证部门被删后员工仍可查 -->
+    <sql id="empWithDept">
+        SELECT e.*, d.dept_name
+        FROM emp e
+        LEFT JOIN dept d ON e.dept_id = d.id
+    </sql>
+
+    <select id="getEmpById" resultMap="empResultMap">
+        <include refid="empWithDept"/>
+        WHERE e.id = #{id}
+    </select>
+
+    <select id="selectAllEmp" resultMap="empResultMap">
+        <include refid="empWithDept"/>
+        ORDER BY e.id DESC
+    </select>
+
+    <!--
+        条件分页查询
+        <where> 标签：智能处理 AND——首个条件前不加 AND，无条件时不产出 WHERE
+        <if>：参数非空才拼条件，null 自动跳过
+        like：用 CONCAT 拼通配符，防手写 '%' 出错
+        分页由 PageHelper 在 Mapper 方法执行前自动追加 LIMIT，SQL里不写死
+    -->
+    <select id="selectByCondition" resultMap="empResultMap">
+        <include refid="empWithDept"/>
+        <where>
+            <if test="name != null and name != ''">
+                AND e.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="deptId != null">
+                AND e.dept_id = #{deptId}
+            </if>
+            <if test="job != null and job != ''">
+                AND e.job LIKE CONCAT('%', #{job}, '%')
+            </if>
+            <if test="gender != null and gender != ''">
+                AND e.gender = #{gender}
+            </if>
+        </where>
+        ORDER BY e.id DESC
+    </select>
+
+    <!-- 新增员工：useGeneratedKeys 拿回自增主键，回填给实体 -->
+    <insert id="insertEmp" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO emp(name,age,gender,phone,job,dept_id,entry_date,create_time,update_time)
+        VALUES(#{name},#{age},#{gender},#{phone},#{job},#{deptId},#{entryDate},#{createTime},#{updateTime})
+    </insert>
+
+    <!-- 修改员工 -->
+    <update id="updateEmp">
+        UPDATE emp
+        SET
+        name = #{name},
+        age = #{age},
+        gender = #{gender},
+        phone = #{phone},
+        job = #{job},
+        dept_id = #{deptId},
+        entry_date = #{entryDate},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteEmp">
+        DELETE FROM emp WHERE id = #{id}
+    </delete>
+
+    <!--
+        批量删除
+        foreach：把 List<Integer> 展开成 (1,2,3)
+        collection="ids" 对应 @Param("ids") 注解的参数名
+    -->
+    <delete id="batchDeleteEmp">
+        DELETE FROM emp WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countByDeptId" resultType="int">
+        SELECT COUNT(*) FROM emp WHERE dept_id = #{deptId}
+    </select>
+
+</mapper>
