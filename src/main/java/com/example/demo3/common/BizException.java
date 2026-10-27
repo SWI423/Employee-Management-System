@@ -18,6 +18,12 @@ public class BizException extends RuntimeException {
         this.code = code;
     }
 
+    /** 直接传 ErrorCode 枚举，统一错误码和提示语 */
+    public BizException(ErrorCode errorCode) {
+        super(errorCode.getMsg());
+        this.code = errorCode.getCode();
+    }
+
     public Integer getCode() {
         return code;
     }

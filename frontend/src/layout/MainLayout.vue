@@ -48,14 +48,15 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
-// 菜单配置（与 router children 对应，权限码控制可见性）
+// 菜单配置（与 router children 对应，权限码控制可见性；perm 为空表示登录即可见）
 const menus = computed(() => {
   const all = [
     { path: '/emp', title: '员工管理', icon: 'User', perm: 'emp:view' },
     { path: '/dept', title: '部门管理', icon: 'OfficeBuilding', perm: 'dept:view' },
-    { path: '/perm', title: '权限管理', icon: 'Lock', perm: 'perm:view' }
+    { path: '/perm', title: '权限管理', icon: 'Lock', perm: 'perm:view' },
+    { path: '/ai', title: 'AI 智能助手', icon: 'ChatDotRound', perm: null }
   ]
-  return all.filter((m) => userStore.hasPerm(m.perm))
+  return all.filter((m) => !m.perm || userStore.hasPerm(m.perm))
 })
 
 const currentTitle = computed(() => {

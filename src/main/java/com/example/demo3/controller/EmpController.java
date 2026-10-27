@@ -6,8 +6,12 @@ import com.example.demo3.common.Result;
 import com.example.demo3.dto.EmpQueryDTO;
 import com.example.demo3.entity.Emp;
 import com.example.demo3.service.EmpService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.List;
  *
  * 接口统一用 Result/PageResult 包装，参数校验用 @Valid + 全局异常处理
  */
+@Tag(name = "员工管理", description = "员工增删改查、条件分页、批量删除")
 @RestController
 @RequestMapping("/emp") // 接口统一前缀：所有接口地址前面都带上 /emp
 public class EmpController {
@@ -32,9 +37,10 @@ public class EmpController {
      * 访问地址：GET http://localhost:8080/emp/1
      * @PathVariable：接收路径上的变量id
      */
+    @Operation(summary = "按 id 查询员工", description = "联查部门名称，不存在返回 404，需 emp:view 权限")
     @GetMapping("/{id}")
     @RequirePermission("emp:view")
-    public Result<Emp> getEmpById(@PathVariable Integer id){
+    public Result<Emp> getEmpById(@Parameter(description = "员工 id") @PathVariable Integer id){
         Emp emp = empService.getEmpById(id);
         return Result.success(emp);
     }
@@ -43,6 +49,7 @@ public class EmpController {
      * 接口2：查询全部员工（联查部门名称）
      * 访问地址：GET http://localhost:8080/emp/list
      */
+    @Operation(summary = "查询全部员工", description = "返回全部员工（联查部门名，按 id 倒序），需 emp:view 权限")
     @GetMapping("/list")
     @RequirePermission("emp:view")
     public Result<List<Emp>> getAllEmp(){
@@ -55,9 +62,10 @@ public class EmpController {
      * 访问地址：GET http://localhost:8080/emp/page?pageNum=1&pageSize=10&name=张&deptId=1
      * @Valid 触发 EmpQueryDTO 上的校验注解，失败由全局异常处理返回 400
      */
+    @Operation(summary = "条件分页查询员工", description = "姓名/部门/岗位/性别组合筛选 + PageHelper 分页，需 emp:view 权限")
     @GetMapping("/page")
     @RequirePermission("emp:view")
-    public Result<PageResult<Emp>> getEmpPage(@Valid EmpQueryDTO query){
+    public Result<PageResult<Emp>> getEmpPage(@ParameterObject @Valid EmpQueryDTO query){
         PageResult<Emp> page = empService.getEmpPage(query);
         return Result.success(page);
     }
@@ -69,6 +77,7 @@ public class EmpController {
      * @Valid：姓名非空、年龄18~60、手机号格式，任一不满足返回字段级错误
      * 访问地址：POST http://localhost:8080/emp/add
      */
+    @Operation(summary = "新增员工", description = "字段校验 + 部门存在性校验，成功后联动失效部门列表缓存，需 emp:add 权限")
     @PostMapping("/add")
     @RequirePermission("emp:add")
     public Result<String> addEmp(@Valid @RequestBody Emp emp){
@@ -80,9 +89,10 @@ public class EmpController {
      * 修改员工
      * 访问地址：PUT http://localhost:8080/emp/1
      */
+    @Operation(summary = "修改员工", description = "员工存在性 + 部门存在性校验，成功后联动失效部门列表缓存，需 emp:edit 权限")
     @PutMapping("/{id}")
     @RequirePermission("emp:edit")
-    public Result<String> updateEmp(@PathVariable Integer id, @Valid @RequestBody Emp emp){
+    public Result<String> updateEmp(@Parameter(description = "员工 id") @PathVariable Integer id, @Valid @RequestBody Emp emp){
         emp.setId(id);
         empService.updateEmp(emp);
         return Result.success("修改员工成功");
@@ -92,9 +102,10 @@ public class EmpController {
      * 删除单个员工
      * 访问地址：DELETE http://localhost:8080/emp/1
      */
+    @Operation(summary = "删除单个员工", description = "不存在返回 404，成功后联动失效部门列表缓存，需 emp:delete 权限")
     @DeleteMapping("/{id}")
     @RequirePermission("emp:delete")
-    public Result<String> deleteEmp(@PathVariable Integer id){
+    public Result<String> deleteEmp(@Parameter(description = "员工 id") @PathVariable Integer id){
         empService.deleteEmp(id);
         return Result.success("删除员工成功");
     }
@@ -105,9 +116,10 @@ public class EmpController {
      * 一次 DELETE ... IN (...) 删除多条，避免前端循环调单删接口
      * 访问地址：DELETE http://localhost:8080/emp/batch
      */
+    @Operation(summary = "批量删除员工", description = "请求体传 id 数组 [1,2,3]，单条 IN 语句删除，需 emp:delete 权限")
     @DeleteMapping("/batch")
     @RequirePermission("emp:delete")
-    public Result<String> batchDeleteEmp(@RequestBody List<Integer> ids){
+    public Result<String> batchDeleteEmp(@Parameter(description = "员工 id 列表，如 [1,2,3]") @RequestBody List<Integer> ids){
         empService.batchDeleteEmp(ids);
         return Result.success("批量删除成功");
     }

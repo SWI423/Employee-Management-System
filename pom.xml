@@ -14,7 +14,7 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>demo01</artifactId>
+    <artifactId>emp-manage</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <!-- 指定JDK版本17，和你项目SDK保持一致 -->
@@ -85,6 +85,26 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
+        <!-- BCrypt密码加密：仅引crypto工具包，不引全Security自动配置，避免影响现有拦截器/AOP -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <!-- Knife4j 接口文档：基于 springdoc-openapi，Boot3 用 jakarta 版，提供 /doc.html 在线调试页 -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+        <!-- 单元/接口测试：JUnit5 + MockMvc，mvn test 使用 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- Maven打包插件，springboot打包成可执行jar -->
@@ -100,6 +120,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <!-- 命令行mvn编译时显式注册Lombok注解处理器，否则@Data/@Slf4j生成的方法找不到 -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.48</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                         <arg>--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>

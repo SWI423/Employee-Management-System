@@ -21,9 +21,13 @@ INSERT IGNORE INTO emp (id, name, age, gender, phone, job, dept_id, entry_date) 
 
 -- ---------- 系统用户（角色） ----------
 -- admin：管理员，拥有全部权限；zhangsan：普通用户，只有查看权限
-INSERT IGNORE INTO sys_user (id, username, password, name, role) VALUES
-(1, 'admin',    'admin123', '系统管理员', 'admin'),
-(2, 'zhangsan', '123456',   '张三',      'user');
+-- 密码为 BCrypt 加盐密文（不可逆），分别对应 admin123 / 123456，登录时用 matches 校验
+-- 用 ON DUPLICATE KEY UPDATE 幂等刷新密码：老库（明文时代建的）启动后自动升级为密文，
+-- 新库直接插入密文；不影响用户自定义的其他账号
+INSERT INTO sys_user (id, username, password, name, role) VALUES
+(1, 'admin',    '$2a$10$ZQnmYUNuB.HX.m/bkVXLC.aLthOJMddkD0Mtw8.1X2IC62RGAKHvy', '系统管理员', 'admin'),
+(2, 'zhangsan', '$2a$10$jTSWX/ZbjOiSt789o2Qpxeb6eRGqQL8gCfkKJnTwnUoVmjqWyWo/q', '张三',      'user')
+ON DUPLICATE KEY UPDATE password = VALUES(password);
 
 -- ---------- 角色权限 ----------
 -- admin：员工/部门/权限三大模块全量操作

@@ -30,6 +30,12 @@ const routes = [
         name: 'PermList',
         component: () => import('@/views/PermList.vue'),
         meta: { title: '权限管理', icon: 'Lock' }
+      },
+      {
+        path: 'ai',
+        name: 'AiChat',
+        component: () => import('@/views/AiChat.vue'),
+        meta: { title: 'AI 智能助手', icon: 'ChatDotRound' }
       }
     ]
   }

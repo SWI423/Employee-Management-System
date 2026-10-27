@@ -15,6 +15,7 @@ public enum ErrorCode {
     UNAUTHORIZED(401, "未登录或登录已过期"),
     FORBIDDEN(403, "没有权限执行该操作"),
     LOGIN_ERROR(401, "账号或密码错误"),
+    LOGIN_LOCKED(401, "账号已锁定，请15分钟后再试"),
 
     // ---------- 业务类 ----------
     NOT_FOUND(404, "数据不存在"),

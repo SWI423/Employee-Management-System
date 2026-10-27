@@ -9,8 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Web MVC 配置：注册登录态拦截器
  * 拦截规则：
- *   /emp/**  /dept/**  /perm/**  → 需要登录
- *   /auth/login 等                → 放行
+ *   /emp/**  /dept/**  /perm/**  /ai/**  → 需要登录
+ *   /auth/login 等                        → 放行
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/emp/**", "/dept/**", "/perm/**") // 拦截业务接口
+                .addPathPatterns("/emp/**", "/dept/**", "/perm/**", "/ai/**") // 拦截业务接口与AI助手
                 .excludePathPatterns("/auth/login", "/auth/logout"); // 放行登录注销
     }
 }

@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS permission (
 CREATE TABLE IF NOT EXISTS sys_user (
     id          INT PRIMARY KEY AUTO_INCREMENT COMMENT '用户主键',
     username    VARCHAR(50)  NOT NULL COMMENT '登录账号',
-    password    VARCHAR(100) NOT NULL COMMENT '密码（课程设计阶段明文，生产应BCrypt加密）',
+    password    VARCHAR(100) NOT NULL COMMENT '密码（BCrypt加盐密文，登录用matches校验，不落明文）',
     name        VARCHAR(50)  DEFAULT NULL COMMENT '真实姓名',
     role        VARCHAR(20)  NOT NULL DEFAULT 'user' COMMENT '角色：admin / user',
     create_time DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

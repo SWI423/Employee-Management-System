@@ -4,12 +4,16 @@ server:
 
 # MySQL数据库连接配置
 spring:
+  # 本地默认激活 local profile：自动加载 application-local.yml（含本地数据库密码与 AI key，该文件已 gitignore，不入库）
+  profiles:
+    default: local
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/emp_manage?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: Ywy20040228
+    # 真实密码在 application-local.yml 或环境变量 MYSQL_PASSWORD 中提供，不入库
+    password: ${MYSQL_PASSWORD:}
     druid:
       initial-size: 5
       min-idle: 5
@@ -67,3 +71,22 @@ pagehelper:
 logging:
   level:
     com.example.demo3: debug
+
+# ---------- Knife4j 接口文档配置 ----------
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn                # 文档界面中文
+    enable-search: true            # 文档页顶部搜索框
+
+# ---------- 智谱 GLM AI 配置（key 不入库，见 application-local.yml 或环境变量 AI_GLM_API_KEY） ----------
+ai:
+  glm:
+    api-key: ${AI_GLM_API_KEY:}
+    base-url: https://open.bigmodel.cn/api/paas/v4
+    model: glm-4-flash
